@@ -21,55 +21,149 @@
     
     <div id="loader-overlay"><div class="spinner"></div></div>
 
-    <div class="container">
-      <header>
-        <h1>Check Link Reaction</h1>
-        <div class="header-meta-container">
-          <div class="datetime-group">
-            <span class="sheet-date">
-              <i class="fa-solid fa-sheet-plastic"></i>
-              ទិន្នន័យថ្ងៃទី៖ <strong id="sheet-date-display">Loading...</strong>
-            </span>
-            <span id="current-time">
-              <i class="fa-regular fa-clock"></i> --:--:-- --
-            </span>
-          </div>
-          <div class="stats-container">
-            <span class="stat-card" id="stat-completed">
-              <i class="fa-solid fa-user-check"></i> 0
-            </span>
-            <span class="stat-card" id="stat-reason">
-              <i class="fa-solid fa-file-circle-exclamation"></i> 0
-            </span>
-            <span class="stat-card" id="stat-pending">
-              <i class="fa-solid fa-user-clock"></i> 0
-            </span>
-          </div>
+    <nav class="app-nav">
+        <button class="nav-tab active" data-tab="daily">
+            <i class="fa-solid fa-clipboard-list"></i> <span>Daily Check-in</span>
+        </button>
+        <button class="nav-tab" data-tab="monthly">
+            <i class="fa-solid fa-chart-pie"></i> <span>Monthly Report</span>
+        </button>
+        <button class="nav-tab" data-tab="admin">
+            <i class="fa-solid fa-shield-halved"></i> <span>Admin Panel</span>
+        </button>
+    </nav>
+
+    <div id="daily-content" class="tab-content active">
+        <div class="container">
+            <header>
+                <h1>Check Link Reaction</h1>
+                <div class="header-meta-container">
+                    <div class="datetime-group">
+                        <span class="sheet-date">
+                            <i class="fa-solid fa-sheet-plastic"></i>
+                            ទិន្នន័យថ្ងៃទី៖ <strong id="sheet-date-display">Loading...</strong>
+                        </span>
+                        <span id="current-time">
+                            <i class="fa-regular fa-clock"></i> --:--:-- --
+                        </span>
+                    </div>
+                    <div class="stats-container">
+                        <span class="stat-card" id="stat-completed">
+                            <i class="fa-solid fa-user-check"></i> 0
+                        </span>
+                        <span class="stat-card" id="stat-reason">
+                            <i class="fa-solid fa-file-circle-exclamation"></i> 0
+                        </span>
+                        <span class="stat-card" id="stat-pending">
+                            <i class="fa-solid fa-user-clock"></i> 0
+                        </span>
+                    </div>
+                </div>
+            </header>
+            
+            <main id="capture-area">
+                <div id="member-list">
+                    <p>កំពុងទាញយកទិន្នន័យសមាជិក...</p>
+                </div>
+                
+                <div class="action-buttons">
+                    <button type="button" id="pdfButton" class="submit-button tertiary">
+                        <i class="fa-solid fa-file-pdf"></i>
+                        <span>ថតជា PDF</span>
+                    </button>
+                    <button type="button" id="captureButton" class="submit-button secondary">
+                        <i class="fa-solid fa-camera"></i>
+                        <span>ថតយករូបភាព</span>
+                    </button>
+                    <button type="button" id="saveButton" class="submit-button" disabled>
+                        <i class="fa-solid fa-cloud-arrow-up"></i>
+                        <span>រក្សាទុកទាំងអស់</span>
+                    </button>
+                </div>
+                
+                <div id="status-message"></div>
+            </main>
         </div>
-      </header>
-      
-      <main id="capture-area">
-        <div id="member-list">
-            <p>កំពុងទាញយកទិន្នន័យសមាជិក...</p>
+    </div>
+
+    <div id="monthly-content" class="tab-content" style="display: none;">
+        <div class="container">
+            <header><h1>Monthly Report</h1></header>
+            <main id="report-capture-area">
+                <div class="report-controls">
+                    <div class="input-group">
+                        <label for="month-select"><i class="fa-solid fa-calendar-days"></i> ជ្រើសរើសខែ</label>
+                        <select id="month-select">
+                            <option value="1">January</option>
+                            <option value="2">February</option>
+                            <option value="3">March</option>
+                            <option value="4">April</option>
+                            <option value="5">May</option>
+                            <option value="6">June</option>
+                            <option value="7">July</option>
+                            <option value="8">August</option>
+                            <option value="9">September</option>
+                            <option value="10">October</option>
+                            <option value="11">November</option>
+                            <option value="12">December</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label for="year-input"><i class="fa-solid fa-calendar"></i> ជ្រើសរើសឆ្នាំ</label>
+                        <input type="number" id="year-input" value="2025" placeholder="Year">
+                    </div>
+                    <button type="button" id="generateReportBtn" class="submit-button">
+                        <i class="fa-solid fa-gears"></i>
+                        <span>បង្កើតរបាយការណ៍</span>
+                    </button>
+                </div>
+                <div id="report-status-message" class="status-message-inline"></div>
+                <div id="report-output">
+                    </div>
+
+                <div id="report-action-buttons" class="action-buttons" style="display: none;">
+                    <button type="button" id="reportPdfButton" class="submit-button tertiary">
+                        <i class="fa-solid fa-file-pdf"></i>
+                        <span>ថតជា PDF</span>
+                    </button>
+                    <button type="button" id="reportCaptureButton" class="submit-button secondary">
+                        <i class="fa-solid fa-camera"></i>
+                        <span>ថតយករូបភាព</span>
+                    </button>
+                </div>
+                
+            </main>
         </div>
-        
-        <div class="action-buttons">
-            <button type="button" id="pdfButton" class="submit-button tertiary">
-                <i class="fa-solid fa-file-pdf"></i>
-                <span>ថតជា PDF</span>
-            </button>
-            <button type="button" id="captureButton" class="submit-button secondary">
-                <i class="fa-solid fa-camera"></i>
-                <span>ថតយករូបភាព</span>
-            </button>
-            <button type="button" id="saveButton" class="submit-button" disabled>
-                <i class="fa-solid fa-cloud-arrow-up"></i>
-                <span>រក្សាទុកទាំងអស់</span>
-            </button>
+    </div>
+
+    <div id="admin-content" class="tab-content" style="display: none;">
+        <div class="container">
+            <header><h1>Admin Panel</h1></header>
+            <main>
+                <div class="admin-panel">
+                    <h3><i class="fa-solid fa-trash-can"></i> លុបទិន្នន័យប្រចាំថ្ងៃ</h3>
+                    <p>ជ្រើសរើសថ្ងៃណាមួយ ដើម្បីលុបទិន្នន័យ (Video Count, Links, Reason) ចេញពី Sheet នោះ។ Sheet នឹងមិនត្រូវបានលុបទេ។</p>
+                    <div class="admin-controls">
+                        <input type="date" id="delete-date-input">
+                        <button type="button" id="deleteDayBtn" class="submit-button danger">
+                            <i class="fa-solid fa-trash"></i> <span>លុបប្រចាំថ្ងៃ</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="admin-panel">
+                    <h3><i class="fa-solid fa-calendar-times"></i> លុបទិន្នន័យប្រចាំខែ</h3>
+                    <p>ជ្រើសរើសខែ និងឆ្នាំ ដើម្បីលុបទិន្នន័យទាំងអស់ (Video Count, Links, Reason) ពីគ្រប់ Sheet ដែលមានក្នុងខែនោះ។</p>
+                    <div class="admin-controls">
+                        <input type="month" id="delete-month-input">
+                        <button type="button" id="deleteMonthBtn" class="submit-button danger">
+                            <i class="fa-solid fa-dumpster-fire"></i> <span>លុបប្រចាំខែ</span>
+                        </button>
+                    </div>
+                </div>
+                <div id="admin-status-message" class="status-message-inline"></div>
+            </main>
         </div>
-        
-        <div id="status-message"></div>
-      </main>
     </div>
     
     <script src="script.js"></script>
