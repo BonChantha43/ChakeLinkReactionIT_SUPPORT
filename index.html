@@ -1,32 +1,37 @@
 <!DOCTYPE html>
 <html lang="km">
+
 <head>
     <base target="_top">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Check Link Reaction</title>
-    
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Kantumruy+Pro:wght@400;500;700&display=swap" rel="stylesheet">
-    
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Kantumruy+Pro:wght@400;500;700&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    
+
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
-    
-    <div id="loader-overlay"><div class="spinner"></div></div>
+
+    <div id="loader-overlay">
+        <div class="spinner"></div>
+    </div>
 
     <nav class="app-nav">
         <button class="nav-tab active" data-tab="daily">
             <i class="fa-solid fa-clipboard-list"></i> <span>Daily Check-in</span>
         </button>
         <button class="nav-tab" data-tab="monthly">
-            <i class="fa-solid fa-chart-pie"></i> <span>Monthly Report</span>
+            <i class="fa-solid fa-chart-pie"></i> <span>Report</span>
         </button>
         <button class="nav-tab" data-tab="admin">
             <i class="fa-solid fa-shield-halved"></i> <span>Admin Panel</span>
@@ -60,12 +65,12 @@
                     </div>
                 </div>
             </header>
-            
+
             <main id="capture-area">
                 <div id="member-list">
                     <p>កំពុងទាញយកទិន្នន័យសមាជិក...</p>
                 </div>
-                
+
                 <div class="action-buttons">
                     <button type="button" id="pdfButton" class="submit-button tertiary">
                         <i class="fa-solid fa-file-pdf"></i>
@@ -80,7 +85,7 @@
                         <span>រក្សាទុកទាំងអស់</span>
                     </button>
                 </div>
-                
+
                 <div id="status-message"></div>
             </main>
         </div>
@@ -88,38 +93,53 @@
 
     <div id="monthly-content" class="tab-content" style="display: none;">
         <div class="container">
-            <header><h1>Monthly Report</h1></header>
+            <header>
+                <h1>Report & Analytics</h1>
+            </header>
             <main id="report-capture-area">
                 <div class="report-controls">
-                    <div class="input-group">
-                        <label for="month-select"><i class="fa-solid fa-calendar-days"></i> ជ្រើសរើសខែ</label>
-                        <select id="month-select">
-                            <option value="1">January</option>
-                            <option value="2">February</option>
-                            <option value="3">March</option>
-                            <option value="4">April</option>
-                            <option value="5">May</option>
-                            <option value="6">June</option>
-                            <option value="7">July</option>
-                            <option value="8">August</option>
-                            <option value="9">September</option>
-                            <option value="10">October</option>
-                            <option value="11">November</option>
-                            <option value="12">December</option>
+                    <div class="input-group" style="max-width: 160px;">
+                        <label><i class="fa-solid fa-filter"></i> មើលតាម</label>
+                        <select id="report-type-select">
+                            <option value="month">ប្រចាំខែ</option>
+                            <option value="day">ប្រចាំថ្ងៃ</option>
                         </select>
                     </div>
-                    <div class="input-group">
-                        <label for="year-input"><i class="fa-solid fa-calendar"></i> ជ្រើសរើសឆ្នាំ</label>
-                        <input type="number" id="year-input" value="2025" placeholder="Year">
+
+                    <div class="input-group" id="month-input-group" style="flex: 2;">
+                        <label><i class="fa-solid fa-calendar-days"></i> ជ្រើសរើសខែ</label>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <select id="month-select" style="flex: 2;">
+                                <option value="1">January</option>
+                                <option value="2">February</option>
+                                <option value="3">March</option>
+                                <option value="4">April</option>
+                                <option value="5">May</option>
+                                <option value="6">June</option>
+                                <option value="7">July</option>
+                                <option value="8">August</option>
+                                <option value="9">September</option>
+                                <option value="10">October</option>
+                                <option value="11">November</option>
+                                <option value="12">December</option>
+                            </select>
+                            <input type="number" id="year-input" value="2025" placeholder="Year" style="flex: 1;">
+                        </div>
                     </div>
+
+                    <div class="input-group" id="date-input-group" style="display: none; flex: 2;">
+                        <label><i class="fa-solid fa-calendar-day"></i> ជ្រើសរើសថ្ងៃ</label>
+                        <input type="date" id="specific-date-input">
+                    </div>
+
                     <button type="button" id="generateReportBtn" class="submit-button">
                         <i class="fa-solid fa-gears"></i>
                         <span>បង្កើតរបាយការណ៍</span>
                     </button>
                 </div>
                 <div id="report-status-message" class="status-message-inline"></div>
-                <div id="report-output">
-                    </div>
+
+                <div id="report-output"></div>
 
                 <div id="report-action-buttons" class="action-buttons" style="display: none;">
                     <button type="button" id="reportPdfButton" class="submit-button tertiary">
@@ -131,18 +151,20 @@
                         <span>ថតយករូបភាព</span>
                     </button>
                 </div>
-                
             </main>
         </div>
     </div>
 
     <div id="admin-content" class="tab-content" style="display: none;">
         <div class="container">
-            <header><h1>Admin Panel</h1></header>
+            <header>
+                <h1>Admin Panel</h1>
+            </header>
             <main>
                 <div class="admin-panel">
                     <h3><i class="fa-solid fa-trash-can"></i> លុបទិន្នន័យប្រចាំថ្ងៃ</h3>
-                    <p>ជ្រើសរើសថ្ងៃណាមួយ ដើម្បីលុបទិន្នន័យ (Video Count, Links, Reason) ចេញពី Sheet នោះ។ Sheet នឹងមិនត្រូវបានលុបទេ។</p>
+                    <p>ជ្រើសរើសថ្ងៃណាមួយ ដើម្បីលុបទិន្នន័យ (Video Count, Links, Reason) ចេញពី Sheet នោះ។ Sheet
+                        នឹងមិនត្រូវបានលុបទេ។</p>
                     <div class="admin-controls">
                         <input type="date" id="delete-date-input">
                         <button type="button" id="deleteDayBtn" class="submit-button danger">
@@ -153,7 +175,8 @@
 
                 <div class="admin-panel">
                     <h3><i class="fa-solid fa-calendar-times"></i> លុបទិន្នន័យប្រចាំខែ</h3>
-                    <p>ជ្រើសរើសខែ និងឆ្នាំ ដើម្បីលុបទិន្នន័យទាំងអស់ (Video Count, Links, Reason) ពីគ្រប់ Sheet ដែលមានក្នុងខែនោះ។</p>
+                    <p>ជ្រើសរើសខែ និងឆ្នាំ ដើម្បីលុបទិន្នន័យទាំងអស់ (Video Count, Links, Reason) ពីគ្រប់ Sheet
+                        ដែលមានក្នុងខែនោះ។</p>
                     <div class="admin-controls">
                         <input type="month" id="delete-month-input">
                         <button type="button" id="deleteMonthBtn" class="submit-button danger">
@@ -165,7 +188,8 @@
             </main>
         </div>
     </div>
-    
+
     <script src="script.js"></script>
 </body>
+
 </html>
