@@ -477,8 +477,6 @@ function renderMonthlyReport(data) {
         `;
   });
 
-  // *** បានលុបផ្នែក <tfoot> (សរុបរួម) ចេញនៅត្រង់នេះហើយ ***
-
   tableHTML += `
             </tbody>
         </table>
@@ -494,82 +492,168 @@ function showReportMessage(type, message) {
   reportStatusMsg.innerText = message;
 }
 
-// --- FIX FOR CLIPPING & PDF (NUCLEAR OPTION) ---
-function handleCaptureReport() {
-  showLoader();
-  const fileName = `Report-Analytics-${new Date()
-    .toISOString()
-    .slice(0, 10)}.png`;
+// --- FIX FOR CLIPPING & PDF (UPDATED SMART LOGIC with WINDOW WIDTH & ASYNC) ---
+async function handleCaptureReport() {
+    showLoader();
+    const originalBtnContent = reportCaptureBtn.innerHTML;
+    reportCaptureBtn.disabled = true;
+    reportCaptureBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> កំពុងដំណើរការ...';
 
-  html2canvas(reportCaptureArea, {
-    scale: 3, // High quality
-    useCORS: true,
-    backgroundColor: "#F3F4F6",
-    windowWidth: 1600, // Force Desktop Layout
-    onclone: (clonedDoc) => {
-      // បង្ខំឱ្យពង្រីក Padding ខ្លាំង ពេលកំពុងថត ដើម្បីកុំឱ្យដាច់អក្សរ
-      const allCells = clonedDoc.querySelectorAll(
-        ".report-table th, .report-table td"
-      );
-      allCells.forEach((cell) => {
-        cell.style.paddingTop = "18px";
-        cell.style.paddingBottom = "18px";
-        cell.style.lineHeight = "2.2"; // បង្កើនគម្លាតបន្ទាត់ខ្លាំង
-        cell.style.whiteSpace = "nowrap"; // ការពារកុំឱ្យធ្លាក់បន្ទាត់គាបគ្នា
-      });
-    },
-  })
-    .then((canvas) => {
-      const link = document.createElement("a");
-      link.download = fileName;
-      link.href = canvas.toDataURL("image/png");
-      link.click();
-      hideLoader();
-    })
-    .catch(onSaveFailure);
+    const fileName = `Report-Analytics-${new Date().toISOString().slice(0, 10)}.png`;
+    
+    // Capture the whole container (Header + UI)
+    const elementToCapture = document.querySelector("#monthly-content .container");
+
+    try {
+        const canvas = await html2canvas(elementToCapture, {
+            scale: 3, 
+            useCORS: true,
+            backgroundColor: "#f3f4f6",
+            logging: false,
+            windowWidth: 1920, // Forces Desktop Layout
+            scrollY: -window.scrollY,
+
+            onclone: (clonedDoc) => {
+                const clonedContainer = clonedDoc.querySelector("#monthly-content .container");
+                const clonedTable = clonedDoc.querySelector(".report-table");
+                const clonedWrapper = clonedDoc.querySelector(".report-table-wrapper");
+                const clonedButtons = clonedDoc.querySelector("#report-action-buttons");
+
+                // Hide the Capture buttons in the image
+                if (clonedButtons) clonedButtons.style.display = "none";
+
+                // Allow Container to expand (Remove max-width)
+                if (clonedContainer) {
+                    clonedContainer.style.maxWidth = "none";
+                    clonedContainer.style.width = "1400px"; // Set a wide width
+                    clonedContainer.style.margin = "0 auto";
+                    clonedContainer.style.padding = "2rem";
+                }
+
+                if (clonedWrapper) {
+                    clonedWrapper.style.overflow = "visible";
+                    clonedWrapper.style.height = "auto";
+                    clonedWrapper.style.boxShadow = "none";
+                }
+
+                if (clonedTable) {
+                    clonedTable.classList.add("snapshot-mode");
+                    clonedTable.style.width = "100%";
+                }
+
+                const clonedHeader = clonedDoc.querySelector("header");
+                if (clonedHeader) {
+                    clonedHeader.style.width = "100%";
+                    clonedHeader.style.boxSizing = "border-box";
+                }
+                
+                const allCells = clonedDoc.querySelectorAll(".report-table th, .report-table td");
+                allCells.forEach(cell => {
+                    cell.style.letterSpacing = 'normal';
+                    cell.style.verticalAlign = 'middle';
+                    if(cell.tagName === 'TH') {
+                        cell.style.backgroundColor = '#3b82f6';
+                        cell.style.color = '#ffffff';
+                    }
+                });
+            }
+        });
+
+        const link = document.createElement("a");
+        link.download = fileName;
+        link.href = canvas.toDataURL("image/png");
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        showReportMessage("success", "បានថតរូបភាពជោគជ័យ!");
+
+    } catch (error) {
+        console.error("Capture Error:", error);
+        showReportMessage("error", "បរាជ័យ៖ " + error.message);
+    } finally {
+        hideLoader();
+        reportCaptureBtn.disabled = false;
+        reportCaptureBtn.innerHTML = originalBtnContent;
+    }
 }
 
-function handleCaptureReportPdf() {
-  showLoader();
-  const fileName = `Report-Analytics-${new Date()
-    .toISOString()
-    .slice(0, 10)}.pdf`;
-  const { jsPDF } = window.jspdf;
+async function handleCaptureReportPdf() {
+    showLoader();
+    const originalBtnContent = reportPdfBtn.innerHTML;
+    reportPdfBtn.disabled = true;
+    reportPdfBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> កំពុងដំណើរការ...';
 
-  html2canvas(reportCaptureArea, {
-    scale: 3,
-    useCORS: true,
-    backgroundColor: "#FFFFFF",
-    windowWidth: 1600,
-    onclone: (clonedDoc) => {
-      // បង្ខំឱ្យពង្រីក Padding ខ្លាំង ដូចគ្នា
-      const allCells = clonedDoc.querySelectorAll(
-        ".report-table th, .report-table td"
-      );
-      allCells.forEach((cell) => {
-        cell.style.paddingTop = "18px";
-        cell.style.paddingBottom = "18px";
-        cell.style.lineHeight = "2.2";
-        cell.style.whiteSpace = "nowrap";
-      });
-    },
-  })
-    .then((canvas) => {
-      const imgData = canvas.toDataURL("image/png");
-      const pdfWidth = canvas.width;
-      const pdfHeight = canvas.height;
+    const fileName = `Report-Analytics-${new Date().toISOString().slice(0, 10)}.pdf`;
+    const { jsPDF } = window.jspdf;
+    
+    // Capture the whole container
+    const elementToCapture = document.querySelector("#monthly-content .container");
 
-      const pdf = new jsPDF({
-        orientation: pdfWidth > pdfHeight ? "landscape" : "portrait",
-        unit: "px",
-        format: [pdfWidth, pdfHeight],
-      });
+    try {
+        const canvas = await html2canvas(elementToCapture, {
+            scale: 3,
+            useCORS: true,
+            backgroundColor: "#ffffff",
+            windowWidth: 1920,
+            onclone: (clonedDoc) => {
+                const clonedContainer = clonedDoc.querySelector("#monthly-content .container");
+                const clonedTable = clonedDoc.querySelector(".report-table");
+                const clonedWrapper = clonedDoc.querySelector(".report-table-wrapper");
+                const clonedButtons = clonedDoc.querySelector("#report-action-buttons");
 
-      pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
-      pdf.save(fileName);
-      hideLoader();
-    })
-    .catch(onSaveFailure);
+                if (clonedButtons) clonedButtons.style.display = "none";
+
+                if (clonedContainer) {
+                    clonedContainer.style.maxWidth = "none";
+                    clonedContainer.style.width = "1400px";
+                    clonedContainer.style.margin = "0 auto";
+                }
+
+                if (clonedWrapper) {
+                    clonedWrapper.style.overflow = "visible";
+                    clonedWrapper.style.boxShadow = "none";
+                }
+                
+                if (clonedTable) {
+                    clonedTable.classList.add("snapshot-mode");
+                    clonedTable.style.minWidth = "100%";
+                }
+                
+                const allCells = clonedDoc.querySelectorAll(".report-table th, .report-table td");
+                allCells.forEach(cell => {
+                    cell.style.letterSpacing = 'normal';
+                    cell.style.verticalAlign = 'middle';
+                    if(cell.tagName === 'TH') {
+                        cell.style.backgroundColor = '#3b82f6';
+                        cell.style.color = '#ffffff';
+                    }
+                });
+            }
+        });
+
+        const imgData = canvas.toDataURL("image/png");
+        const imgWidth = canvas.width;
+        const imgHeight = canvas.height;
+
+        const pdf = new jsPDF({
+            orientation: imgWidth > imgHeight ? "landscape" : "portrait",
+            unit: "px",
+            format: [imgWidth, imgHeight],
+        });
+
+        pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight);
+        pdf.save(fileName);
+        showReportMessage("success", "បានថត PDF ជោគជ័យ!");
+
+    } catch (error) {
+        console.error("PDF Error:", error);
+        showReportMessage("error", "បរាជ័យ៖ " + error.message);
+    } finally {
+        hideLoader();
+        reportPdfBtn.disabled = false;
+        reportPdfBtn.innerHTML = originalBtnContent;
+    }
 }
 
 // --- Admin Functions ---
